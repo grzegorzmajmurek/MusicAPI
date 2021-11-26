@@ -13,6 +13,8 @@ namespace MusicAPI.Models
         public string Duration { get; set; }
         public DateTime UploadedDate { get; set; }
         public int ArtistId { get; set; }
-        public int? AlbumId { get; set; }
+        public int AlbumId { get; set; }
+        public int GenreId { get; set; }
+        public int PlaylistId { get; set; }
     }
 }

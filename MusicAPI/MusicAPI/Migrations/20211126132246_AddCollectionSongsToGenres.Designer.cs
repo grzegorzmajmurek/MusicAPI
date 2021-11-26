@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicAPI.Data;
 
 namespace MusicAPI.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211126132246_AddCollectionSongsToGenres")]
+    partial class AddCollectionSongsToGenres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,12 +31,17 @@ namespace MusicAPI.Migrations
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("GenreId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
+
+                    b.HasIndex("GenreId");
 
                     b.ToTable("Albums");
                 });
@@ -133,6 +140,10 @@ namespace MusicAPI.Migrations
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MusicAPI.Models.Genre", null)
+                        .WithMany("Albums")
+                        .HasForeignKey("GenreId");
                 });
 
             modelBuilder.Entity("MusicAPI.Models.Song", b =>
@@ -168,6 +179,8 @@ namespace MusicAPI.Migrations
 
             modelBuilder.Entity("MusicAPI.Models.Genre", b =>
                 {
+                    b.Navigation("Albums");
+
                     b.Navigation("Songs");
                 });
 

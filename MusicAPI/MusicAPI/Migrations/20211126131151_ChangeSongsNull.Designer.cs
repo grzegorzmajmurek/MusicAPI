@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicAPI.Data;
 
 namespace MusicAPI.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211126131151_ChangeSongsNull")]
+    partial class ChangeSongsNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,12 +31,17 @@ namespace MusicAPI.Migrations
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("GenreId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
+
+                    b.HasIndex("GenreId");
 
                     b.ToTable("Albums");
                 });
@@ -94,7 +101,7 @@ namespace MusicAPI.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AlbumId")
+                    b.Property<int?>("AlbumId")
                         .HasColumnType("int");
 
                     b.Property<int>("ArtistId")
@@ -103,10 +110,10 @@ namespace MusicAPI.Migrations
                     b.Property<string>("Duration")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GenreId")
+                    b.Property<int?>("GenreId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PlaylistId")
+                    b.Property<int?>("PlaylistId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -118,8 +125,6 @@ namespace MusicAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlbumId");
-
-                    b.HasIndex("GenreId");
 
                     b.HasIndex("PlaylistId");
 
@@ -133,27 +138,21 @@ namespace MusicAPI.Migrations
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MusicAPI.Models.Genre", null)
+                        .WithMany("Albums")
+                        .HasForeignKey("GenreId");
                 });
 
             modelBuilder.Entity("MusicAPI.Models.Song", b =>
                 {
                     b.HasOne("MusicAPI.Models.Album", null)
                         .WithMany("Songs")
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicAPI.Models.Genre", null)
-                        .WithMany("Songs")
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AlbumId");
 
                     b.HasOne("MusicAPI.Models.Playlist", null)
                         .WithMany("Songs")
-                        .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PlaylistId");
                 });
 
             modelBuilder.Entity("MusicAPI.Models.Album", b =>
@@ -168,7 +167,7 @@ namespace MusicAPI.Migrations
 
             modelBuilder.Entity("MusicAPI.Models.Genre", b =>
                 {
-                    b.Navigation("Songs");
+                    b.Navigation("Albums");
                 });
 
             modelBuilder.Entity("MusicAPI.Models.Playlist", b =>
