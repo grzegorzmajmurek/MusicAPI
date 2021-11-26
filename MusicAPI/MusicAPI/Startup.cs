@@ -30,6 +30,7 @@ namespace MusicAPI
         {
 
             services.AddControllers();
+            services.AddMvc().AddXmlDataContractSerializerFormatters();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicAPI", Version = "v1" });
@@ -38,7 +39,7 @@ namespace MusicAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApiDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -46,8 +47,6 @@ namespace MusicAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MusicAPI v1"));
             }
-
-            dbContext.Database.EnsureCreated();
 
             app.UseHttpsRedirection();
 
