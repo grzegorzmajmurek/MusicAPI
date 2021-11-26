@@ -83,7 +83,6 @@ namespace MusicAPI.Controllers
                    Songs = list.Songs
                }).ToListAsync();
 
-
             var songs = genreDetails
                 .Where(genre => genre.Id == genreId)
                 // sprawdz czy jest puste , jezeli tak to []
@@ -92,6 +91,23 @@ namespace MusicAPI.Controllers
                 .Songs
                 .Where(song => song.Id == id);
             return Ok(songs);
+        }
+
+        // PUT api/<GenreController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Genre genreObj)
+        {
+            var genre = await _dbContext.Genres.FindAsync(id);
+            if (genre == null)
+            {
+                return NotFound("No genre found against this Id");
+            }
+            else
+            {
+                genre.Name = genreObj.Name;
+                await _dbContext.SaveChangesAsync();
+                return Ok("Genre updated sucessfully");
+            }
         }
     }
 }

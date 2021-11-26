@@ -93,5 +93,22 @@ namespace MusicAPI.Controllers
                 .Where(song => song.Id == id);
             return Ok(songs);
         }
+
+        // PUT api/<AlbumController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Album albumObj)
+        {
+            var album = await _dbContext.Albums.FindAsync(id);
+            if (album == null)
+            {
+                return NotFound("No albums found against this Id");
+            }
+            else
+            {
+                album.Name = albumObj.Name;
+                await _dbContext.SaveChangesAsync();
+                return Ok("Album updated sucessfully");
+            }
+        }
     }
 }

@@ -42,5 +42,23 @@ namespace MusicAPI.Controllers
 
             return Ok(artists);
         }
+
+        // PUT api/<ArtistController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Artist artistObj)
+        {
+            var artist = await _dbContext.Artists.FindAsync(id);
+            if (artist == null)
+            {
+                return NotFound("No artist found against this Id");
+            }
+            else
+            {
+                artist.Name = artistObj.Name;
+                artist.Surname = artistObj.Surname;
+                await _dbContext.SaveChangesAsync();
+                return Ok("Artist updated sucessfully");
+            }
+        }
     }
 }

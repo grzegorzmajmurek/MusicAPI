@@ -28,6 +28,7 @@ namespace MusicAPI.Controllers
             await _dbContext.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
+
         //api/songs
         [HttpGet]
         public async Task<IActionResult> GetSongs()
@@ -40,10 +41,30 @@ namespace MusicAPI.Controllers
                                    Duration = song.Duration,
                                    UploadSong = song.UploadedDate,
                                    AlbumId = song.AlbumId,
-                                   ArtistId = song.ArtistId
+                                   ArtistId = song.ArtistId,
+                                   GenreId = song.GenreId,
+                                   PlaylistId = song.PlaylistId
                                }).ToListAsync();
 
             return Ok(songs);
+        }
+
+        // PUT api/<SongsController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Song songObj)
+        {
+            var song = await _dbContext.Songs.FindAsync(id);
+            if (song == null)
+            {
+                return NotFound("No record found against this Id");
+            }
+            else
+            {
+                song.Title = songObj.Title;
+                song.Duration = songObj.Duration;
+                await _dbContext.SaveChangesAsync();
+                return Ok("Record updated sucessfully");
+            }
         }
     }
 }
