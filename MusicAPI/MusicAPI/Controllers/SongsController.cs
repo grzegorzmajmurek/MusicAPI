@@ -66,5 +66,15 @@ namespace MusicAPI.Controllers
                 return Ok("Record updated sucessfully");
             }
         }
+
+        // DELETE api/<SongsController>/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var song = _dbContext.Songs.Find(id);
+            _dbContext.Songs.Remove(song);
+            await _dbContext.SaveChangesAsync();
+            return Ok("Record deleted successfully");
+        }
     }
 }

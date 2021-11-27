@@ -109,5 +109,15 @@ namespace MusicAPI.Controllers
                 return Ok("Genre updated sucessfully");
             }
         }
+
+        // DELETE api/<GenresController>/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var genre = _dbContext.Genres.Find(id);
+            _dbContext.Genres.Remove(genre);
+            await _dbContext.SaveChangesAsync();
+            return Ok("Genre deleted successfully");
+        }
     }
 }

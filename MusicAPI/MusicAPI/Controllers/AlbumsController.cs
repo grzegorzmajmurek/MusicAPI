@@ -110,5 +110,15 @@ namespace MusicAPI.Controllers
                 return Ok("Album updated sucessfully");
             }
         }
+
+        // DELETE api/<AlbumsController>/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var album = _dbContext.Albums.Find(id);
+            _dbContext.Albums.Remove(album);
+            await _dbContext.SaveChangesAsync();
+            return Ok("Album deleted successfully");
+        }
     }
 }
