@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.DTOs.GenreDTO;
 using MusicAPI.Models;
 
 namespace MusicAPI.Controllers
@@ -14,16 +16,18 @@ namespace MusicAPI.Controllers
     [ApiController]
     public class GenresController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private ApiDbContext _dbContext;
-        public GenresController(ApiDbContext dbContext)
+        public GenresController(IMapper mapper, ApiDbContext dbContext)
         {
+            _mapper = mapper;
             _dbContext = dbContext;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Genre genre)
+        public async Task<IActionResult> Post([FromBody] GenreDto genre)
         {
-            await _dbContext.Genres.AddAsync(genre);
+            await _dbContext.Genres.AddAsync(_mapper.Map<Genre>(genre));
             await _dbContext.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
@@ -50,8 +54,7 @@ namespace MusicAPI.Controllers
                 select new
                 {
                     Id = list.Id,
-                    Name = list.Name,
-                    Songs = list.Songs
+                    Name = list.Name
                 }
                 ).Where(list => list.Id == genreId).ToListAsync();
             return Ok(genreDetails);
@@ -59,15 +62,16 @@ namespace MusicAPI.Controllers
 
         //api/genres/{albumId}/songs
         [HttpGet("{genreId}/songs")]
-        public async Task<IActionResult> AlbumsDetailsSongs()
+        public async Task<IActionResult> AlbumsDetailsSongs(int genreId)
         {
             var genreDetails = await (
                 from list in _dbContext.Genres
                 select new
                 {
+                    Id = list.Id,
                     Songs = list.Songs
                 }
-                ).ToListAsync();
+                ).Where(list => list.Id == genreId).ToListAsync();
             return Ok(genreDetails);
         }
 
@@ -95,7 +99,7 @@ namespace MusicAPI.Controllers
 
         // PUT api/<GenreController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Genre genreObj)
+        public async Task<IActionResult> Put(int id, [FromBody] GenreDto genreObj)
         {
             var genre = await _dbContext.Genres.FindAsync(id);
             if (genre == null)

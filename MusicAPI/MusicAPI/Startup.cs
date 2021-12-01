@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MusicAPI.Data;
+using MusicAPI.Mapping;
 
 namespace MusicAPI
 {
@@ -29,6 +30,7 @@ namespace MusicAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddSingleton(AutoMapperConfig.Initialize());
             services.AddControllers();
             services.AddMvc().AddXmlDataContractSerializerFormatters();
             services.AddSwaggerGen(c =>

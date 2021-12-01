@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.DTOs.ArtistDTO;
 using MusicAPI.Models;
 
 namespace MusicAPI.Controllers
@@ -14,16 +16,18 @@ namespace MusicAPI.Controllers
     [ApiController]
     public class ArtistsController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private ApiDbContext _dbContext;
-        public ArtistsController(ApiDbContext dbContext)
+        public ArtistsController(IMapper mapper, ApiDbContext dbContext)
         {
+            _mapper = mapper;
             _dbContext = dbContext;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Artist artist)
+        public async Task<IActionResult> Post([FromBody] ArtistDto artist)
         {
-            await _dbContext.Artists.AddAsync(artist);
+            await _dbContext.Artists.AddAsync(_mapper.Map<Artist>(artist));
             await _dbContext.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
@@ -45,7 +49,7 @@ namespace MusicAPI.Controllers
 
         // PUT api/<ArtistController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Artist artistObj)
+        public async Task<IActionResult> Put(int id, [FromBody] ArtistDto artistObj)
         {
             var artist = await _dbContext.Artists.FindAsync(id);
             if (artist == null)

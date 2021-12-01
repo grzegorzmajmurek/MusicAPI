@@ -1,27 +1,32 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.DTOs.SongDTO;
 using MusicAPI.Models;
 
 namespace MusicAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PlaylistsController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private ApiDbContext _dbContext;
-        public PlaylistsController(ApiDbContext dbContext)
+
+        public PlaylistsController(IMapper mapper, ApiDbContext dbContext)
         {
+            _mapper = mapper;
             _dbContext = dbContext;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Playlist playlist)
+        public async Task<IActionResult> Post([FromBody] PlaylistDto playlist)
         {
-            await _dbContext.Playlists.AddAsync(playlist);
+            await _dbContext.Playlists.AddAsync(_mapper.Map<Playlist>(playlist));
             await _dbContext.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
@@ -35,7 +40,6 @@ namespace MusicAPI.Controllers
                                    {
                                        Id = playlist.Id,
                                        Name = playlist.Name,
-                                       Songs = playlist.Songs
                                    }).ToListAsync();
 
             return Ok(playlists);
@@ -51,7 +55,6 @@ namespace MusicAPI.Controllers
                 {
                     Id = list.Id,
                     Name = list.Name,
-                    Songs = list.Songs
                 }
                 ).Where(list => list.Id == playlistId).ToListAsync();
             return Ok(playlistDetails);
@@ -59,15 +62,17 @@ namespace MusicAPI.Controllers
 
         //api/playlists/{playlistId}/songs
         [HttpGet("{playlistId}/songs")]
-        public async Task<IActionResult> PlaylistDetailsSongs()
+        public async Task<IActionResult> PlaylistDetailsSongs(int playlistId, SongDto songDto)
         {
+
             var playlistDetails = await (
                 from list in _dbContext.Playlists
                 select new
                 {
+                    Id = list.Id,
                     Songs = list.Songs
                 }
-                ).ToListAsync();
+                ).Where(list => list.Id == playlistId).ToListAsync();
             return Ok(playlistDetails);
         }
 
@@ -91,12 +96,12 @@ namespace MusicAPI.Controllers
                 .First()
                 .Songs
                 .Where(song => song.Id == id);
-                return Ok(songs);
+            return Ok(songs);
         }
 
         // PUT api/<PlaylistController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Playlist playlistObj)
+        public async Task<IActionResult> Put(int id, [FromBody] PlaylistDto playlistObj)
         {
             var playlist = await _dbContext.Playlists.FindAsync(id);
             if (playlist == null)
